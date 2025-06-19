@@ -1,0 +1,93 @@
+/* register.css */
+
+.register-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e8f5e9; /* สีเขียวอ่อน เพื่อความรู้สึกสดชื่น */
+    padding: 20px;
+  }
+  
+  .register-title {
+    font-size: 36px; /* ขนาดตัวอักษรใหญ่ขึ้น */
+    color: #2e7d32; /* สีเขียวเข้ม เพื่อความรู้สึกทางการ */
+    margin-bottom: 30px; /* เพิ่มระยะห่างด้านล่าง */
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .register-form {
+    width: 100%;
+    max-width: 450px; /* ขยายขนาดฟอร์ม */
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px; /* เพิ่มความโค้งมนให้ฟอร์ม */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* เพิ่มเงานุ่ม */
+  }
+  
+  .register-input {
+    width: 94%;
+    padding: 14px;
+    margin-bottom: 20px; /* เพิ่มระยะห่างระหว่างอินพุต */
+    border: 1px solid #c8e6c9; /* ขอบสีเขียวอ่อน */
+    border-radius: 8px; /* มุมโค้งมน */
+    font-size: 16px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .register-input:focus {
+    border-color: #66bb6a; /* ขอบที่เข้มขึ้นเมื่อเลือกอินพุต */
+  }
+  
+  .register-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #66bb6a; /* ปุ่มสีเขียว */
+    color: white;
+    font-size: 18px; /* ขนาดตัวอักษรปุ่ม */
+    border: none;
+    border-radius: 8px; /* มุมโค้งมน */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 600;
+  }
+  
+  .register-btn:hover {
+    background-color: #388e3c; /* เปลี่ยนสีเมื่อ hover */
+  }
+  
+  .register-btn:active {
+    background-color: #2e7d32; /* สีเข้มขึ้นเมื่อคลิก */
+  }
+  
+  .error-message {
+    color: red;
+    margin-bottom: 15px; /* เพิ่มระยะห่างจากข้อความอื่น */
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .register-link {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .register-link p {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .register-link a {
+    color: #66bb6a;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .register-link a:hover {
+    text-decoration: underline; /* เพิ่มขีดเส้นใต้เมื่อ hover */
+  }
+  

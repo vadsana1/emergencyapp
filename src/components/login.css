@@ -1,0 +1,87 @@
+/* login.css */
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e8f5e9; /* สีเขียวอ่อนเพื่อให้ดูเป็นมิตร */
+    padding: 20px;
+  }
+  
+  .login-title {
+    font-size: 36px;
+    color: #2e7d32; /* สีเขียวเข้มให้ดูเป็นทางการ */
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .login-form {
+    width: 100%;
+    max-width: 450px; /* เพิ่มขนาดที่เหมาะสม */
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px; /* เพิ่มความโค้งให้สวยงาม */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* เพิ่มเงาที่นุ่มนวล */
+  }
+  
+  .login-input {
+    width: 95%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 1px solid #c8e6c9; /* สีขอบเบาๆ ให้ดูสะอาดตา */
+    border-radius: 8px; /* มุมที่โค้งมน */
+    font-size: 16px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .login-input:focus {
+    border-color: #66bb6a; /* สีเขียวเข้มเมื่อคลิก */
+  }
+  
+  .login-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #9e0924; /* ปรับสีปุ่มให้สดใส */
+    color: white;
+    font-size: 18px;
+    border: none;
+   
+    border-radius: 8px; /* มุมโค้งมน */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 600;
+  }
+  
+  .login-btn:hover {
+    background-color: #388e3c; /* เมื่อ hover จะมีสีเข้มขึ้น */
+  }
+  
+  .login-btn:active {
+    background-color: #2e7d32; /* สีเข้มขึ้นเมื่อคลิก */
+  }
+  
+  .register-link {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .register-link p {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .register-link a {
+    color: #66bb6a; /* สีที่เน้นใช้เป็นสีเขียว */
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .register-link a:hover {
+    text-decoration: underline; /* เพิ่มขีดเส้นใต้เมื่อ hover */
+  }
+  
