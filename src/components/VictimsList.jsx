@@ -27,7 +27,7 @@ const columnHeaders = [
   "ຈັດການຂໍ້ມູນ"
 ];
 
-// Modal
+// Modal component
 function Modal({ show, onClose, children }) {
   if (!show) return null;
   return (
@@ -53,9 +53,9 @@ const IncidentVictimsTable = () => {
   // Modal State
   const [editModal, setEditModal] = useState({ open: false, row: null });
   const [deleteModal, setDeleteModal] = useState({ open: false, row: null });
-  // Edit form state
+  // Edit form state (เพิ่ม victimStatus)
   const [editForm, setEditForm] = useState({
-    name: '', age: '', gender: '', injuryDetail: ''
+    name: '', age: '', gender: '', injuryDetail: '', victimStatus: ''
   });
   // Search/filter
   const [searchText, setSearchText] = useState('');
@@ -109,6 +109,7 @@ const IncidentVictimsTable = () => {
       age: row.age || '',
       gender: row.gender || '',
       injuryDetail: row.injuryDetail || '',
+      victimStatus: row.victimStatus || '',
     });
     setEditModal({ open: true, row });
   };
@@ -125,6 +126,7 @@ const IncidentVictimsTable = () => {
         age: editForm.age,
         gender: editForm.gender,
         injuryDetail: editForm.injuryDetail,
+        victimStatus: editForm.victimStatus,
       });
       closeEditModal();
     } catch (e) {
@@ -156,7 +158,6 @@ const IncidentVictimsTable = () => {
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
             />
-            {/* future: filter btn here */}
           </div>
           <div className="rounded-xl overflow-x-auto bg-[#23263a] shadow-inner ring-1 ring-[#31344e]/50">
             <table className="min-w-[900px] w-full text-base">
@@ -281,6 +282,18 @@ const IncidentVictimsTable = () => {
               value={editForm.injuryDetail}
               onChange={e => setEditForm({ ...editForm, injuryDetail: e.target.value })}
             />
+          </div>
+          <div>
+            <label className="block mb-1 text-gray-600">ສະຖານະ</label>
+            <select
+              className="w-full border border-gray-300 px-3 py-2 rounded-xl focus:outline-none"
+              value={editForm.victimStatus}
+              onChange={e => setEditForm({ ...editForm, victimStatus: e.target.value })}
+            >
+              <option value="">ເລືອກສະຖານະ</option>
+              <option value="ເສຍຊີວິດ">ເສຍຊີວິດ</option>
+              <option value="ບາດເຈັບ">ບາດເຈັບ</option>
+            </select>
           </div>
           <div className="flex gap-3 mt-6 justify-end">
             <button
