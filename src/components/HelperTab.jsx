@@ -58,6 +58,7 @@ const HelperTab = () => {
     setAllHelpers(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     setLoading(false);
   };
+  
 
   // Team dropdown
   const fetchTeamOptions = async () => {
@@ -143,7 +144,10 @@ const HelperTab = () => {
   };
 
     const handleSaveEditHelperModal = async () => {
-      if (!editHelper) return;
+      if (!editHelper || !editHelper.uid) {
+        alert('ไม่พบ uid ของผู้ใช้นี้');
+        return;
+      }
       try {
         const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-edit-user', {
           method: 'POST',
@@ -158,6 +162,7 @@ const HelperTab = () => {
             helperType: editHelper.helperType,
           }),
         });
+      
         const data = await res.json();
         if (data.success) {
           setShowEditHelperModal(false);
