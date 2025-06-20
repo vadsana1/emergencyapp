@@ -54,7 +54,7 @@ app.post('/api/admin-update-password', async (req, res) => {
     return res.status(400).json({ error: 'Missing authUid or password' });
   }
   try {
-    await admin.auth().updateUser(uid, { password });
+    await admin.auth().updateUser(uid, { password,email });
     if (userId) {
       await admin.firestore().collection('users').doc(userId).update({ password,email });
     }
