@@ -78,6 +78,32 @@ app.post('/api/delete-user-account', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+app.post('/api/admin-edit-user', async (req, res) => {
+  const { uid, userId, email, password, name, phone, helperType } = req.body;
+  if (!uid || !userId) {
+    return res.status(400).json({ error: 'Missing uid or userId' });
+  }
+  try {
+    // Update Firebase Auth if email or password is provided
+    const updateAuth = {};
+    if (email) updateAuth.email = email;
+    if (password) updateAuth.password = password;
+    if (Object.keys(updateAuth).length > 0) {
+      await admin.auth().updateUser(uid, updateAuth);
+    }
+    // Update Firestore
+    const updateData = {};
+    if (email) updateData.email = email;
+    if (name) updateData.name = name;
+    if (password) updateData.password = password; // Not recommended for production
+    if (phone) updateData.phone = phone;
+    if (helperType) updateData.helperType = helperType;
+    await admin.firestore().collection('users').doc(userId).update(updateData);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 
 const PORT = process.env.PORT || 4000;
