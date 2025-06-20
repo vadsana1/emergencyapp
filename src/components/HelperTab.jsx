@@ -149,6 +149,7 @@ const HelperTab = () => {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            uid: editHelper.uid,
             userId: editHelper.userId,
             email: editHelper.email,
             password: editHelper.password,
@@ -187,6 +188,7 @@ const HelperTab = () => {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          uid: helperToDelete.uid,
           userId: helperToDelete.userId,
         }),
       });
