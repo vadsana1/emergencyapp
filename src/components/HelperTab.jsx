@@ -103,7 +103,7 @@ const HelperTab = () => {
         return;
       }
       // เรียก backend API เพื่อสร้าง user (คุณต้องมี API นี้อยู่แล้ว)
-      const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/', {
+      const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-create-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

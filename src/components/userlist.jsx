@@ -129,7 +129,7 @@ const UserList = () => {
   };
 
   async function deleteUserAccount({ uid, userId }) {
-    const response = await fetch('http://localhost:4000/api/delete-user-account', {
+    const response = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/delete-user-account', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ uid, userId }),
@@ -296,7 +296,7 @@ const UserList = () => {
             ຢືນຢັນການລຶບຂໍ້ມູນ
           </div>
           <div className="mb-6 text-gray-700">
-            ຕ້ອງການລຶບຜູ້ໃຊ້: <span className="font-bold">{deleteModal.row?.userId}</span> ຫຼືບໍ?
+            ຕ້ອງການລຶບຜູໃຊ້: <span className="font-bold">{deleteModal.row?.userId}</span> ຫຼືບໍ?
           </div>
           <div className="flex gap-4 justify-center">
             <button
