@@ -141,8 +141,7 @@ const HelperTab = () => {
     setEditHelper(null);
     setShowEditHelperModal(false);
   };
-  const handleSaveEditHelperModal = async () => {
-    if (!editHelper) return;
+
     const handleSaveEditHelperModal = async () => {
       if (!editHelper) return;
       try {
@@ -171,10 +170,6 @@ const HelperTab = () => {
       }
     };
     
-    setShowEditHelperModal(false);
-    setEditHelper(null);
-    fetchAllHelpers();
-  };
 
   // Delete Helper Dialog
   const handleAskDeleteHelper = (helper) => {
