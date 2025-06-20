@@ -143,14 +143,34 @@ const HelperTab = () => {
   };
   const handleSaveEditHelperModal = async () => {
     if (!editHelper) return;
-    await updateDoc(doc(db, 'users', editHelper.id), {
-      name: editHelper.name,
-      email: editHelper.email,
-      phone: editHelper.phone,
-      helperType: editHelper.helperType,
-      userId: editHelper.userId,
-      password: editHelper.password
-    });
+    const handleSaveEditHelperModal = async () => {
+      if (!editHelper) return;
+      try {
+        const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-edit-user', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: editHelper.userId,
+            email: editHelper.email,
+            password: editHelper.password,
+            name: editHelper.name,
+            phone: editHelper.phone,
+            helperType: editHelper.helperType,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setShowEditHelperModal(false);
+          setEditHelper(null);
+          fetchAllHelpers();
+        } else {
+          alert(data.error || 'ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ');
+        }
+      } catch (err) {
+        alert('ການເຊື່ອມ API ລົ້ມເຫຼວ');
+      }
+    };
+    
     setShowEditHelperModal(false);
     setEditHelper(null);
     fetchAllHelpers();
@@ -167,11 +187,27 @@ const HelperTab = () => {
   };
   const handleConfirmDeleteHelper = async () => {
     if (!helperToDelete) return;
-    await deleteDoc(doc(db, 'users', helperToDelete.id));
-    setShowDeleteHelperModal(false);
-    setHelperToDelete(null);
-    fetchAllHelpers();
+    try {
+      const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-delete-user', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: helperToDelete.userId,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowDeleteHelperModal(false);
+        setHelperToDelete(null);
+        fetchAllHelpers();
+      } else {
+        alert(data.error || 'ລົບບໍສຳເລັດ');
+      }
+    } catch (err) {
+      alert('ການເຊື່ອມ API ລົ້ມເຫຼວ');
+    }
   };
+  
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 relative">
