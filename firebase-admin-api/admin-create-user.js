@@ -1,7 +1,7 @@
 // server.js หรือ index.js
 const express = require('express');
 const cors = require('cors');
-const admin = require('firebase-admin'); // path ของ serviceAccount
+const admin = require('firebase-admin');
 const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 
 admin.initializeApp({
@@ -12,79 +12,59 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+/**
+ * CREATE USER (Admin)
+ * รับ: { userId, email, password, name, phone, helperType }
+ * ตอบกลับ: { success, uid, userId }
+ */
 app.post('/api/admin-create-user', async (req, res) => {
-  console.log('BODY:', req.body); 
   const { userId, email, password, name, phone, helperType } = req.body;
   if (!userId || !email || !password) {
     return res.status(400).json({ error: 'Missing userId, email, or password' });
   }
 
   try {
-    
     // 1. สร้าง user ใน Firebase Auth
     const userRecord = await admin.auth().createUser({
       email,
       password,
       displayName: name,
     });
-    
-    // 2. เพิ่ม Firestore ด้วย doc id = userId ที่ frontend ส่งมา (u001, u002, ...)
+
+    // 2. สร้างเอกสาร Firestore (ใช้ userId เป็น doc id)
     await admin.firestore().collection('users').doc(userId).set({
-      userId,                // จะเป็น u001, u002, ... 
+      userId,                
       email,
       name,
       phone,
       helperType,
-      password,              // ไม่ควรเก็บ plain-text password ใน production
+      // password,          // (ห้ามเก็บ plain-text password ใน production)
       role: 'helper',
       profileImage: '',
-      uid: userRecord.uid,    // uid ที่แท้จริงใน Firebase Auth
+      uid: userRecord.uid,   // uid ของจริง
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    res.json({ success: true, uid: userId });
+    res.json({ success: true, uid: userRecord.uid, userId });
   } catch (err) {
+    console.error('admin-create-user error:', err);
     res.status(400).json({ error: err.message });
   }
 });
-app.post('/api/admin-update-password', async (req, res) => {
-  const { uid, password,email, userId } = req.body;
-  console.log('API admin-update-password:', req.body);
-  if (!uid || !password ||!email ) {
-    return res.status(400).json({ error: 'Missing authUid or password' });
-  }
-  try {
-    await admin.auth().updateUser(uid, { password,email });
-    if (userId) {
-      await admin.firestore().collection('users').doc(userId).update({ password,email });
-    }
-    res.json({ success: true });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-app.post('/api/delete-user-account', async (req, res) => {
-  const { uid, userId } = req.body;
-  if (!uid || !userId) {
-    return res.status(400).json({ error: 'Missing uid or userId' });
-  }
-  try {
-    // 1. ลบออกจาก Firebase Auth
-    await admin.auth().deleteUser(uid);
-    // 2. ลบออกจาก Firestore
-    await admin.firestore().collection('users').doc(userId).delete();
-    res.json({ success: true });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+
+/**
+ * EDIT USER INFO (Admin)
+ * เปลี่ยนข้อมูล (รวมถึงรหัสผ่านได้)
+ * รับ: { uid, userId, email?, password?, name?, phone?, helperType? }
+ * ตอบกลับ: { success }
+ */
 app.post('/api/admin-edit-user', async (req, res) => {
   const { uid, userId, email, password, name, phone, helperType } = req.body;
   if (!uid || !userId) {
     return res.status(400).json({ error: 'Missing uid or userId' });
   }
   try {
-    // Update Firebase Auth if email or password is provided
+    // Update Firebase Auth (email/password)
     const updateAuth = {};
     if (email) updateAuth.email = email;
     if (password) updateAuth.password = password;
@@ -95,16 +75,38 @@ app.post('/api/admin-edit-user', async (req, res) => {
     const updateData = {};
     if (email) updateData.email = email;
     if (name) updateData.name = name;
-    if (password) updateData.password = password; // Not recommended for production
+    // if (password) updateData.password = password; // ไม่ควรเก็บ plain-text password!
     if (phone) updateData.phone = phone;
     if (helperType) updateData.helperType = helperType;
     await admin.firestore().collection('users').doc(userId).update(updateData);
     res.json({ success: true });
   } catch (err) {
+    console.error('admin-edit-user error:', err);
     res.status(400).json({ error: err.message });
   }
 });
 
+/**
+ * DELETE USER (Admin)
+ * รับ: { uid, userId }
+ * ตอบกลับ: { success }
+ */
+app.post('/api/delete-user-account', async (req, res) => {
+  const { uid, userId } = req.body;
+  if (!uid || !userId) {
+    return res.status(400).json({ error: 'Missing uid or userId' });
+  }
+  try {
+    // ลบออกจาก Firebase Auth
+    await admin.auth().deleteUser(uid);
+    // ลบออกจาก Firestore
+    await admin.firestore().collection('users').doc(userId).delete();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('delete-user-account error:', err);
+    res.status(400).json({ error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
