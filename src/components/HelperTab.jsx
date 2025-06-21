@@ -148,13 +148,23 @@ const HelperTab = () => {
       if (!editHelper || !editHelper.uid) {
         alert('ไม่พบ uid ของผู้ใช้นี้');
         return;
-      }
+    }
+    console.log('edit payload:', {
+      uid: editHelper.uid,
+      userId: editHelper.userId,
+      email: editHelper.email,
+      password: editHelper.password,
+      name: editHelper.name,
+      phone: editHelper.phone,
+      helperType: editHelper.helperType,
+    });
       try {
         const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-edit-user', {
           method: 'put',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            uid: editHelper.uid,
+
+            uid: user.uid,
             userId: editHelper.userId,
             email: editHelper.email,
             password: editHelper.password,
