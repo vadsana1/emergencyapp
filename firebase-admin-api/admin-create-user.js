@@ -66,27 +66,27 @@ app.post('/api/admin-edit-user', async (req, res) => {
     return res.status(400).json({ error: 'Missing uid or userId' });
   }
   try {
-    // Update Firebase Auth
+    // อัปเดตใน Firebase Auth
     const updateAuth = {};
     if (email) updateAuth.email = email;
     if (password) updateAuth.password = password;
     if (Object.keys(updateAuth).length > 0) {
       await admin.auth().updateUser(uid, updateAuth);
     }
-
-    // Update Firestore
+    // อัปเดตใน Firestore
     const updateData = {};
     if (email) updateData.email = email;
     if (name) updateData.name = name;
     if (phone) updateData.phone = phone;
     if (helperType) updateData.helperType = helperType;
-    await admin.firestore().collection('users').doc(userId).update(updateData);
+    await admin.firestore().collection('users').doc(uid).update(updateData);
 
     res.json({ success: true });
-  } catch (error) {
-    res.json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
+
 
 /**
  * DELETE USER (Admin)
