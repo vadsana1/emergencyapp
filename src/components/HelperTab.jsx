@@ -430,10 +430,10 @@ const HelperTab = () => {
                       <div>
                         <label className="block text-gray-700 mb-1">ຮູບພາບ</label>
                         <img
-  src={editHelper?.profileImageUrl || editHelper?.profileImage || '/default-profile.png'}
+  src={editHelper?.profileImageUrl || editHelper?.profileImage || 'public/default-profile.png'}
   alt="profile"
   className="w-16 h-16 rounded-full border object-cover"
-  onError={e => { e.target.src = '/default-profile.png'; }}
+  onError={e => { e.target.src = 'public/default-profile.png'; }}
 />
 
                         <div className="text-xs text-gray-400 pt-2">
