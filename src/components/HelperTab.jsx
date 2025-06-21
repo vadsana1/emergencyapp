@@ -429,12 +429,18 @@ const HelperTab = () => {
                       </div>
                       <div>
                         <label className="block text-gray-700 mb-1">ຮູບພາບ</label>
-                        <img
-  src={editHelper?.profileImageUrl || editHelper?.profileImage || 'public/default-profile.png'}
-  alt="profile"
-  className="w-16 h-16 rounded-full border object-cover"
-  onError={e => { e.target.src = 'public/default-profile.png'; }}
-/>
+                        {(editHelper?.profileImageUrl || editHelper?.profileImage) ? (
+  <img
+    src={editHelper.profileImageUrl || editHelper.profileImage}
+    alt="profile"
+    className="w-16 h-16 rounded-full border object-cover"
+  />
+) : (
+  <div className="w-16 h-16 rounded-full border bg-gray-100 flex items-center justify-center text-gray-400">
+    {/* ไอคอนหรือ Text ตรงนี้ก็ได้ */}
+    -
+  </div>
+)}
 
                         <div className="text-xs text-gray-400 pt-2">
                           * ຜູ້ໃຊ້ຈະຈັດການຮູບເອງຜ່ານໜ້າແອັບ
