@@ -110,23 +110,6 @@ app.post('/api/delete-user-account', async (req, res) => {
 });
 
 
-app.post('/api/delete-user-account', async (req, res) => {
-  const { uid, userId } = req.body;
-  if (!uid || !userId) {
-    return res.status(400).json({ error: 'Missing uid or userId' });
-  }
-  try {
-    // ลบออกจาก Firebase Auth
-    await admin.auth().deleteUser(uid);
-    // ลบออกจาก Firestore
-    await admin.firestore().collection('users').doc(userId).delete();
-    res.json({ success: true });
-  } catch (err) {
-    console.error('delete-user-account error:', err);
-    res.status(400).json({ error: err.message });
-  }
-});
-
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Admin API running on http://localhost:${PORT}`);
