@@ -87,11 +87,7 @@ app.post('/api/admin-edit-user', async (req, res) => {
 });
 
 
-/**
- * DELETE USER (Admin)
- * รับ: { uid, userId }
- * ตอบกลับ: { success }
- */
+
 app.post('/api/delete-user-account', async (req, res) => {
   const { uid, userId } = req.body;
   if (!uid || !userId) {
