@@ -143,7 +143,8 @@ const HelperTab = () => {
     setShowEditHelperModal(false);
   };
 
-    const handleSaveEditHelperModal = async () => {
+  const handleSaveEditHelperModal = async (e) => {
+    e.preventDefault(); 
       if (!editHelper || !editHelper.uid) {
         alert('ไม่พบ uid ของผู้ใช้นี้');
         return;
@@ -395,7 +396,8 @@ const HelperTab = () => {
                       ×
                     </button>
                     <h3 className="text-xl font-bold mb-4 text-center">ແກ້ໄຂຂໍ້ມູນທີມຊ່ວຍເຫຼືອ</h3>
-                    <form onSubmit={e => { e.preventDefault(); handleSaveEditHelperModal(); }} className="space-y-3">
+                    <form onSubmit={handleSaveEditHelperModal} className="space-y-3">
+                    
                       <div>
                         <label className="block text-gray-700 mb-1">userId</label>
                         <input className="border px-3 py-2 rounded w-full bg-gray-100"
@@ -455,9 +457,10 @@ const HelperTab = () => {
                           onClick={handleCloseEditHelperModal}>ຍົກເລີກ</button>
                         <button type="submit"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                    onSubmit={handleSaveEditHelperModal} >ບັນທຶກ</button>
-                      </div>
-                    </form>
+                    >ບັນທຶກ</button>
+              </div>
+              
+              </form>
                   </div>
                 </div>
               )}
