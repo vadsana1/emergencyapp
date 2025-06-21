@@ -38,7 +38,7 @@ app.post('/api/admin-create-user', async (req, res) => {
       name,
       phone,
       helperType,
-      // password,          // (ห้ามเก็บ plain-text password ใน production)
+      password,          // (ห้ามเก็บ plain-text password ใน production)
       role: 'helper',
       profileImage: '',
       uid: userRecord.uid,   // uid ของจริง
@@ -76,6 +76,7 @@ app.post('/api/admin-edit-user', async (req, res) => {
     const updateData = {};
     if (email) updateData.email = email;
     if (name) updateData.name = name;
+ // ไม่ควรเก็บ plain-text password!
     if (phone) updateData.phone = phone;
     if (helperType) updateData.helperType = helperType;
     await admin.firestore().collection('users').doc(userId).update(updateData);
@@ -86,6 +87,27 @@ app.post('/api/admin-edit-user', async (req, res) => {
   }
 });
 
+/**
+ * DELETE USER (Admin)
+ * รับ: { uid, userId }
+ * ตอบกลับ: { success }
+ */
+app.post('/api/delete-user-account', async (req, res) => {
+  const { uid, userId } = req.body;
+  if (!uid || !userId) {
+    return res.status(400).json({ error: 'Missing uid or userId' });
+  }
+  try {
+    // ลบออกจาก Firebase Auth
+    await admin.auth().deleteUser(uid);
+    // ลบออกจาก Firestore
+    await admin.firestore().collection('users').doc(userId).delete();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('delete-user-account error:', err);
+    res.status(400).json({ error: err.message });
+  }
+});
 
 
 app.post('/api/delete-user-account', async (req, res) => {
