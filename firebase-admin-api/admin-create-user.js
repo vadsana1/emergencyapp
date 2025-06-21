@@ -60,7 +60,7 @@ app.post('/api/admin-create-user', async (req, res) => {
  * รับ: { uid, userId, email?, password?, name?, phone?, helperType? }
  * ตอบกลับ: { success }
  */
-app.put('/api/admin-edit-user', async (req, res) => {
+app.post('/api/admin-edit-user', async (req, res) => {
   const { uid, userId, email, password, name, phone, helperType } = req.body;
   if (!uid || !userId) {
     return res.status(400).json({ error: 'Missing uid or userId' });
@@ -93,7 +93,7 @@ app.put('/api/admin-edit-user', async (req, res) => {
  * รับ: { uid, userId }
  * ตอบกลับ: { success }
  */
-app.delete('/api/delete-user-account', async (req, res) => {
+app.post('/api/delete-user-account', async (req, res) => {
   const { uid, userId } = req.body;
   if (!uid || !userId) {
     return res.status(400).json({ error: 'Missing uid or userId' });

@@ -160,11 +160,11 @@ const HelperTab = () => {
     });
       try {
         const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-edit-user', {
-          method: 'put',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
 
-            uid: user.uid,
+            uid: editHelper.uid,
             userId: editHelper.userId,
             email: editHelper.email,
             password: editHelper.password,
@@ -203,7 +203,7 @@ const HelperTab = () => {
     if (!helperToDelete) return;
     try {
       const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/delete-user-account',{
-        method: 'delete',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid: helperToDelete.uid,
