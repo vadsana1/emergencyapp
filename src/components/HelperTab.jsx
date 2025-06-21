@@ -351,7 +351,7 @@ const HelperTab = () => {
                       {/* ไม่มี input อัพโหลดรูป */}
                       <div>
                         <img
-                          src={'/default-profile.png'}
+                          src={''}
                           alt="profile"
                           className="w-5 h-5 rounded-full border object-cover"
                         />
