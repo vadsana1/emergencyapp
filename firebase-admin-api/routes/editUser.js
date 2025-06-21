@@ -9,7 +9,7 @@ module.exports = (admin) => {
         }
         try {
             const updateAuth = {};
-            if (email) updateAuth.email = email;
+            
             if (password) updateAuth.password = password;
             if (Object.keys(updateAuth).length > 0) {
                 await admin.auth().updateUser(uid, updateAuth);

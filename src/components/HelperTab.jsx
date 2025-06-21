@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import {
-  collection, getDocs, updateDoc, deleteDoc, doc, query, where
+  collection, getDocs, query, where
 } from 'firebase/firestore';
-
 
 // generateUserId ฟังก์ชันเหมือนเดิม
 const generateUserId = (helpers) => {
@@ -50,7 +49,7 @@ const HelperTab = () => {
     setVisibleRows(10);
   }, [allHelpers.length]);
 
-  // Tab 1
+  // Fetch helpers
   const fetchAllHelpers = async () => {
     setLoading(true);
     const q = query(collection(db, 'users'), where('role', '==', 'helper'));
@@ -58,9 +57,8 @@ const HelperTab = () => {
     setAllHelpers(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     setLoading(false);
   };
-  
 
-  // Team dropdown
+  // Fetch ทีม
   const fetchTeamOptions = async () => {
     setLoadingTeams(true);
     const q = query(collection(db, 'helper_teams'));
@@ -144,51 +142,37 @@ const HelperTab = () => {
   };
 
   const handleSaveEditHelperModal = async (e) => {
-    e.preventDefault(); 
-      if (!editHelper || !editHelper.uid) {
-        alert('ไม่พบ uid ของผู้ใช้นี้');
-        return;
+    e.preventDefault();
+    if (!editHelper || !editHelper.uid) {
+      alert('ไม่พบ uid ของผู้ใช้นี้');
+      return;
     }
-    console.log('edit payload:', {
-      uid: editHelper.uid,
-      userId: editHelper.userId,
-      email: editHelper.email,
-      password: editHelper.password,
-      name: editHelper.name,
-      phone: editHelper.phone,
-      helperType: editHelper.helperType,
-    });
-      try {
-        const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-edit-user', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+    try {
+      const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-edit-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: editHelper.uid,
+          userId: editHelper.userId,
+          email: editHelper.email,
+          name: editHelper.name,
+          phone: editHelper.phone,
+          helperType: editHelper.helperType,
+        }),
+      });
 
-            uid: editHelper.uid,
-            userId: editHelper.userId,
-            email: editHelper.email,
-            password: editHelper.password,
-            name: editHelper.name,
-            phone: editHelper.phone,
-            helperType: editHelper.helperType,
-          }),
-
-          
-        });
-      
-        const data = await res.json();
-        if (data.success) {
-          setShowEditHelperModal(false);
-          setEditHelper(null);
-          fetchAllHelpers();
-        } else {
-          alert(data.error || 'ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ');
-        }
-      } catch (err) {
-        alert('ການເຊື່ອມ API ລົ້ມເຫຼວ');
+      const data = await res.json();
+      if (data.success) {
+        setShowEditHelperModal(false);
+        setEditHelper(null);
+        fetchAllHelpers();
+      } else {
+        alert(data.error || 'ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ');
       }
-    };
-    
+    } catch (err) {
+      alert('ການເຊື່ອມ API ລົ້ມເຫຼວ');
+    }
+  };
 
   // Delete Helper Dialog
   const handleAskDeleteHelper = (helper) => {
@@ -202,7 +186,7 @@ const HelperTab = () => {
   const handleConfirmDeleteHelper = async () => {
     if (!helperToDelete) return;
     try {
-      const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/delete-user-account',{
+      const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/delete-user-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -222,7 +206,26 @@ const HelperTab = () => {
       alert('ການເຊື່ອມ API ລົ້ມເຫຼວ');
     }
   };
-  
+
+  // ===== Reset Password =====
+  const handleResetPassword = async (email) => {
+    if (!window.confirm(`ต้องการส่งอีเมล reset password ไปที่\n${email} ใช่หรือไม่?`)) return;
+    try {
+      const res = await fetch('https://emergencyapp-production-45d8.up.railway.app/api/admin-reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('ส่งอีเมล reset password สำเร็จแล้ว กรุณาแจ้งทีมช่วยเหลือให้เช็คอีเมล');
+      } else {
+        alert(data.error || 'ส่งอีเมลไม่สำเร็จ');
+      }
+    } catch (err) {
+      alert('เชื่อมต่อ API ไม่สำเร็จ');
+    }
+  };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 relative">
@@ -247,7 +250,6 @@ const HelperTab = () => {
                 <th className="px-4 py-2 border text-left">userId</th>
                 <th className="px-4 py-2 border text-left">ຊື່</th>
                 <th className="px-4 py-2 border text-left">ອີເມວ</th>
-                <th className="px-4 py-2 border text-left">ລະຫັດຜ່ານ</th>
                 <th className="px-4 py-2 border text-left">ເບີໂທ</th>
                 <th className="px-4 py-2 border text-left">ປະເພດທີມ</th>
                 <th className="px-4 py-2 border text-left">ຮູບພາບ</th>
@@ -264,7 +266,6 @@ const HelperTab = () => {
                     <td className="px-4 py-2 border">{helper.userId}</td>
                     <td className="px-4 py-2 border">{helper.name}</td>
                     <td className="px-4 py-2 border">{helper.email}</td>
-                    <td className="px-4 py-2 border">{helper.password}</td>
                     <td className="px-4 py-2 border">{helper.phone}</td>
                     <td className="px-4 py-2 border">{teamLabel}</td>
                     <td className="relative w-20 h-20">
@@ -285,10 +286,21 @@ const HelperTab = () => {
                       </div>
                     </td>
                     <td className="px-4 py-2 border text-center space-x-1">
-                      <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
-                        onClick={() => handleOpenEditHelperModal(helper)}>ແກ້ໄຂ</button>
-                      <button className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
-                        onClick={() => handleAskDeleteHelper(helper)}>ລົບ</button>
+                      <button
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
+                        onClick={() => handleOpenEditHelperModal(helper)}>
+                        ແກ້ໄຂ
+                      </button>
+                      <button
+                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                        onClick={() => handleAskDeleteHelper(helper)}>
+                        ລົບ
+                      </button>
+                      <button
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded"
+                        onClick={() => handleResetPassword(helper.email)}>
+                        Reset Password
+                      </button>
                     </td>
                   </tr>
                 );
@@ -309,209 +321,188 @@ const HelperTab = () => {
         </div>
       )}
 
-      {/* Add Modal, Edit Modal, Delete Dialog, Info Dialog */}
+      {/* Add Modal */}
       {showAddModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                  <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-                    <button
-                      className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
-                      onClick={handleCloseAddModal}
-                    >
-                      ×
-                    </button>
-                    <h3 className="text-xl font-bold mb-4 text-center">ເພີ່ມທີມຊ່ວຍເຫຼືອ</h3>
-                    <form onSubmit={handleAddHelper} className="space-y-3">
-                      <div>
-                        <label className="block text-gray-700 mb-1">userId (auto)</label>
-                        <input className="border px-3 py-2 rounded w-full bg-gray-100"
-                          name="userId" value={newHelper.userId} readOnly />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ຊື່</label>
-                        <input className="border px-3 py-2 rounded w-full"
-                          name="name" value={newHelper.name}
-                          onChange={handleChangeNewHelper} required />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ອີເມວ</label>
-                        <input className="border px-3 py-2 rounded w-full"
-                          name="email" type="email" value={newHelper.email}
-                          onChange={handleChangeNewHelper} required />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ລະຫັດຜ່ານ</label>
-                        <div className="relative">
-                          <input className="border px-3 py-2 rounded w-full pr-10"
-                            name="password" type={showPassword ? "text" : "password"}
-                            value={newHelper.password} onChange={handleChangeNewHelper} required />
-                          <button type="button"
-                            className="absolute right-2 top-2 text-gray-600"
-                            tabIndex={-1}
-                            onClick={() => setShowPassword(v => !v)}>
-                            {showPassword ? "🙈" : "👁️"}
-                          </button>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ເບີໂທ</label>
-                        <input className="border px-3 py-2 rounded w-full"
-                          name="phone" value={newHelper.phone}
-                          onChange={handleChangeNewHelper} required />
-                      </div>
-                      {/* ไม่มี input อัพโหลดรูป */}
-                      <div>
-                        <img
-                          src={''}
-                          alt="profile"
-                          className="w-5 h-5 rounded-full border object-cover"
-                        />
-                        <div className="text-xs text-gray-400 pt-2">
-                          * ຜູ້ໃຊ້ຈະຈັດການຮູບເອງຜ່ານໜ້າແອັບ
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ປະເພດທີມ</label>
-                        <select className="border px-3 py-2 rounded w-full"
-                          name="helperType" value={newHelper.helperType}
-                          onChange={handleChangeNewHelper} required disabled={loadingTeams}>
-                          <option value="">ເລືອກປະເພດທີມ</option>
-                          {teamOptions.map(opt => (
-                            <option key={opt.id} value={opt.type}>
-                              {opt.type} ({opt.name})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="flex justify-end pt-3">
-                        <button type="button"
-                          className="mr-2 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
-                          onClick={handleCloseAddModal} disabled={adding}>ຍົກເລີກ</button>
-                        <button type="submit"
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                          disabled={adding}>{adding ? 'ກຳລັງບັນທຶກ...' : 'ບັນທຶກ'}</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              )}
-
-              {/* Edit Helper Modal */}
-              {showEditHelperModal && editHelper && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                  <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-                    <button
-                      className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
-                      onClick={handleCloseEditHelperModal}
-                    >
-                      ×
-                    </button>
-                    <h3 className="text-xl font-bold mb-4 text-center">ແກ້ໄຂຂໍ້ມູນທີມຊ່ວຍເຫຼືອ</h3>
-                    <form onSubmit={handleSaveEditHelperModal} className="space-y-3">
-                    
-                      <div>
-                        <label className="block text-gray-700 mb-1">userId</label>
-                        <input className="border px-3 py-2 rounded w-full bg-gray-100"
-                          value={editHelper.userId} readOnly />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ຊື່</label>
-                        <input className="border px-3 py-2 rounded w-full"
-                          value={editHelper.name}
-                          onChange={e => setEditHelper({ ...editHelper, name: e.target.value })} required />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ອີເມວ</label>
-                        <input className="border px-3 py-2 rounded w-full" type="email"
-                          value={editHelper.email}
-                          onChange={e => setEditHelper({ ...editHelper, email: e.target.value })} required />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ລະຫັດຜ່ານ</label>
-                        <input className="border px-3 py-2 rounded w-full"
-                          value={editHelper.password} type="text"
-                          onChange={e => setEditHelper({ ...editHelper, password: e.target.value })} required />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ເບີໂທ</label>
-                        <input className="border px-3 py-2 rounded w-full"
-                          value={editHelper.phone}
-                          onChange={e => setEditHelper({ ...editHelper, phone: e.target.value })} required />
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ຮູບພາບ</label>
-                        {(editHelper?.profileImageUrl || editHelper?.profileImage) ? (
-  <img
-    src={editHelper.profileImageUrl || editHelper.profileImage}
-    alt="profile"
-    className="w-16 h-16 rounded-full border object-cover"
-  />
-) : (
-  <div className="w-16 h-16 rounded-full border bg-gray-100 flex items-center justify-center text-gray-400">
-    {/* ไอคอนหรือ Text ตรงนี้ก็ได้ */}
-    -
-  </div>
-)}
-
-                        <div className="text-xs text-gray-400 pt-2">
-                          * ຜູ້ໃຊ້ຈະຈັດການຮູບເອງຜ່ານໜ້າແອັບ
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 mb-1">ປະເພດທີມ</label>
-                        <select className="border px-3 py-2 rounded w-full"
-                          value={editHelper.helperType}
-                          onChange={e => setEditHelper({ ...editHelper, helperType: e.target.value })} required>
-                          <option value="">ເລືອກປະເພດທີມ</option>
-                          {teamOptions.map(opt => (
-                            <option key={opt.id} value={opt.type}>
-                              {opt.name} ({opt.type})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="flex justify-end pt-3">
-                        <button type="button"
-                          className="mr-2 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
-                          onClick={handleCloseEditHelperModal}>ຍົກເລີກ</button>
-                        <button type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                    >ບັນທຶກ</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
+              onClick={handleCloseAddModal}
+            >
+              ×
+            </button>
+            <h3 className="text-xl font-bold mb-4 text-center">ເພີ່ມທີມຊ່ວຍເຫຼືອ</h3>
+            <form onSubmit={handleAddHelper} className="space-y-3">
+              <div>
+                <label className="block text-gray-700 mb-1">userId (auto)</label>
+                <input className="border px-3 py-2 rounded w-full bg-gray-100"
+                  name="userId" value={newHelper.userId} readOnly />
               </div>
-              
-              </form>
-                  </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ຊື່</label>
+                <input className="border px-3 py-2 rounded w-full"
+                  name="name" value={newHelper.name}
+                  onChange={handleChangeNewHelper} required />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ອີເມວ</label>
+                <input className="border px-3 py-2 rounded w-full"
+                  name="email" type="email" value={newHelper.email}
+                  onChange={handleChangeNewHelper} required />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ລະຫັດຜ່ານ</label>
+                <div className="relative">
+                  <input className="border px-3 py-2 rounded w-full pr-10"
+                    name="password" type={showPassword ? "text" : "password"}
+                    value={newHelper.password} onChange={handleChangeNewHelper} required />
+                  <button type="button"
+                    className="absolute right-2 top-2 text-gray-600"
+                    tabIndex={-1}
+                    onClick={() => setShowPassword(v => !v)}>
+                    {showPassword ? "🙈" : "👁️"}
+                  </button>
                 </div>
-              )}
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ເບີໂທ</label>
+                <input className="border px-3 py-2 rounded w-full"
+                  name="phone" value={newHelper.phone}
+                  onChange={handleChangeNewHelper} required />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ປະເພດທີມ</label>
+                <select className="border px-3 py-2 rounded w-full"
+                  name="helperType" value={newHelper.helperType}
+                  onChange={handleChangeNewHelper} required disabled={loadingTeams}>
+                  <option value="">ເລືອກປະເພດທີມ</option>
+                  {teamOptions.map(opt => (
+                    <option key={opt.id} value={opt.type}>
+                      {opt.type} ({opt.name})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end pt-3">
+                <button type="button"
+                  className="mr-2 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={handleCloseAddModal} disabled={adding}>ຍົກເລີກ</button>
+                <button type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                  disabled={adding}>{adding ? 'ກຳລັງບັນທຶກ...' : 'ບັນທຶກ'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-              {/* Delete Helper Modal */}
-              {showDeleteHelperModal && helperToDelete && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                  <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm relative text-center">
-                    <h3 className="text-xl font-bold mb-4 text-red-600">ຢືນຢັນການລົບ</h3>
-                    <p className="mb-6">ຕ້ອງການລົບ <b>{helperToDelete.name}</b> ຫຼືບໍ?</p>
-                    <div className="flex justify-center gap-3">
-                      <button className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
-                        onClick={handleCancelDeleteHelper}>ຍົກເລີກ</button>
-                      <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-                        onClick={handleConfirmDeleteHelper}>ລົບ</button>
-                    </div>
+      {/* Edit Helper Modal */}
+      {showEditHelperModal && editHelper && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
+              onClick={handleCloseEditHelperModal}
+            >
+              ×
+            </button>
+            <h3 className="text-xl font-bold mb-4 text-center">ແກ້ໄຂຂໍ້ມູນທີມຊ່ວຍເຫຼືອ</h3>
+            <form onSubmit={handleSaveEditHelperModal} className="space-y-3">
+              <div>
+                <label className="block text-gray-700 mb-1">userId</label>
+                <input className="border px-3 py-2 rounded w-full bg-gray-100"
+                  value={editHelper.userId} readOnly />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ຊື່</label>
+                <input className="border px-3 py-2 rounded w-full"
+                  value={editHelper.name}
+                  onChange={e => setEditHelper({ ...editHelper, name: e.target.value })} required />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ອີເມວ</label>
+                <input className="border px-3 py-2 rounded w-full" type="email"
+                  value={editHelper.email}
+                  onChange={e => setEditHelper({ ...editHelper, email: e.target.value })} required />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ເບີໂທ</label>
+                <input className="border px-3 py-2 rounded w-full"
+                  value={editHelper.phone}
+                  onChange={e => setEditHelper({ ...editHelper, phone: e.target.value })} required />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ຮູບພາບ</label>
+                {(editHelper?.profileImageUrl || editHelper?.profileImage) ? (
+                  <img
+                    src={editHelper.profileImageUrl || editHelper.profileImage}
+                    alt="profile"
+                    className="w-16 h-16 rounded-full border object-cover"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full border bg-gray-100 flex items-center justify-center text-gray-400">
+                    -
                   </div>
+                )}
+                <div className="text-xs text-gray-400 pt-2">
+                  * ຜູ້ໃຊ້ຈະຈັດການຮູບເອງຜ່ານໜ້າແອັບ
                 </div>
-              )}
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">ປະເພດທີມ</label>
+                <select className="border px-3 py-2 rounded w-full"
+                  value={editHelper.helperType}
+                  onChange={e => setEditHelper({ ...editHelper, helperType: e.target.value })} required>
+                  <option value="">ເລືອກປະເພດທີມ</option>
+                  {teamOptions.map(opt => (
+                    <option key={opt.id} value={opt.type}>
+                      {opt.name} ({opt.type})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end pt-3">
+                <button type="button"
+                  className="mr-2 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={handleCloseEditHelperModal}>ຍົກເລີກ</button>
+                <button type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                >ບັນທຶກ</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-              {/* Show Created Info */}
-              {showCreatedInfo && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                  <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm relative text-center">
-                    <h4 className="font-bold text-lg mb-4 text-green-600">ສ້າງບັນຊີສຳເລັດ!</h4>
-                    <div className="mb-2"><b>Email:</b> {createdHelperInfo.email}</div>
-                    <div className="mb-4"><b>Password:</b> {createdHelperInfo.password}</div>
-                    <p className="text-sm text-gray-500 mb-4">ກະລຸນາຄັດລອກ/ແຈ້ງໃຫ້ທີມງານນຳໄປໃຊ້ login </p>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded"
-                      onClick={() => setShowCreatedInfo(false)}>ປິດ</button>
-                  </div>
-                </div>
-              )}
+      {/* Delete Helper Modal */}
+      {showDeleteHelperModal && helperToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm relative text-center">
+            <h3 className="text-xl font-bold mb-4 text-red-600">ຢືນຢັນການລົບ</h3>
+            <p className="mb-6">ຕ້ອງການລົບ <b>{helperToDelete.name}</b> ຫຼືບໍ?</p>
+            <div className="flex justify-center gap-3">
+              <button className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={handleCancelDeleteHelper}>ຍົກເລີກ</button>
+              <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                onClick={handleConfirmDeleteHelper}>ລົບ</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Show Created Info */}
+      {showCreatedInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm relative text-center">
+            <h4 className="font-bold text-lg mb-4 text-green-600">ສ້າງບັນຊີສຳເລັດ!</h4>
+            <div className="mb-2"><b>Email:</b> {createdHelperInfo.email}</div>
+            <div className="mb-4"><b>Password:</b> {createdHelperInfo.password}</div>
+            <p className="text-sm text-gray-500 mb-4">ກະລຸນາຄັດລອກ/ແຈ້ງໃຫ້ທີມງານນຳໄປໃຊ້ login </p>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded"
+              onClick={() => setShowCreatedInfo(false)}>ປິດ</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
