@@ -48,6 +48,8 @@ app.post('/api/admin-create-user', async (req, res) => {
     res.json({ success: true, uid: userRecord.uid, userId });
   } catch (err) {
     console.error('admin-create-user error:', err);
+    console.log('[admin-edit-user] payload:', req.body);
+
     res.status(400).json({ error: err.message });
   }
 });
@@ -59,31 +61,30 @@ app.post('/api/admin-create-user', async (req, res) => {
  * ตอบกลับ: { success }
  */
 app.post('/api/admin-edit-user', async (req, res) => {
-  console.log('[admin-edit-user] payload:', req.body);  // log payload
   const { uid, userId, email, password, name, phone, helperType } = req.body;
   if (!uid || !userId) {
     return res.status(400).json({ error: 'Missing uid or userId' });
   }
   try {
-    // Update Firebase Auth (email/password)
+    // Update Firebase Auth
     const updateAuth = {};
     if (email) updateAuth.email = email;
     if (password) updateAuth.password = password;
     if (Object.keys(updateAuth).length > 0) {
       await admin.auth().updateUser(uid, updateAuth);
     }
+
     // Update Firestore
     const updateData = {};
     if (email) updateData.email = email;
     if (name) updateData.name = name;
- // ไม่ควรเก็บ plain-text password!
     if (phone) updateData.phone = phone;
     if (helperType) updateData.helperType = helperType;
     await admin.firestore().collection('users').doc(userId).update(updateData);
+
     res.json({ success: true });
-  } catch (err) {
-    console.error('admin-edit-user error:', err);
-    res.status(400).json({ error: err.message });
+  } catch (error) {
+    res.json({ error: error.message });
   }
 });
 

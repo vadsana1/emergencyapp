@@ -454,7 +454,8 @@ const HelperTab = () => {
                           className="mr-2 bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
                           onClick={handleCloseEditHelperModal}>ຍົກເລີກ</button>
                         <button type="submit"
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">ບັນທຶກ</button>
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                    onSubmit={handleSaveEditHelperModal} >ບັນທຶກ</button>
                       </div>
                     </form>
                   </div>
